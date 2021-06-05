@@ -1,0 +1,1329 @@
+//iMain er code
+
+#include<iostream>
+using namespace std;
+#include "iGraphics.h"
+#include "bitmap_loader.h"
+#include "main.h"
+//#include "main1.h"
+#include<string>
+
+
+int x = 300, y = 300;
+int win_b = 400, win_l = 400;
+float delay = 0;
+int speed = 0;
+
+
+
+/*
+ function iDraw() is called again and again by the system.
+
+ */
+void drawRoadLines(int offset)
+{
+	int len = 10;
+	int width = 5;
+	int gap = 10;
+	int midx = 0, midy = win_l / 2;
+	for (int i = 0; i < win_b / (len + gap); i++)
+		iFilledRectangle((i * (len + gap) + offset) % win_b, midy, len, width);
+}
+
+
+char marImage[5][16] = {"image\\run2.bmp", "image\\run3.bmp", "image\\run4.bmp", "image\\run5.bmp"};
+char marImage_for_level2[5][16]={"image\\run2.bmp", "image\\run3.bmp", "image\\run4.bmp", "image\\run5.bmp"};
+//char marStand[20] = "image\\charStand.bmp";
+
+char marioJ[2][17] = {"image\\jump1.bmp", "image\\jump2.bmp"};
+char marioJ_for_level2[2][17] = {"image\\jump1.bmp", "image\\jump2.bmp"};
+
+//char back1[3][16] = {"image\\a.bmp", "image\\b.bmp", "image\\c.bmp"};
+//char back2[3][16] = {"image\\a1.bmp", "image\\b1.bmp", "image\\c1.bmp"};
+
+//char obstImage[2][20] = {"image\\ob.bmp"};
+
+
+
+int marioCoordinateX = 0;
+int marioCoordinateX_for_level2 = 0;
+
+int marioCoordinateY = 0;
+int marioCoordinateY_for_level2 = 0;
+//int marioIndex = 0;
+
+//bool standPositon = true;
+//int standCounter = 0;
+
+bool menuImageBool = true;
+bool menuImageBool_for_level2 = true;
+
+bool optionSelectionBool = true;
+bool optionSelectionBool_for_level2 = true;
+
+bool backgroundImageBool = true;
+bool backgroundImageBool_for_level2 = true;
+
+bool showBorderForOption = false;
+
+
+
+bool optionMenuFinished = false;
+bool optionMenuFinished_for_level2 = false;
+
+char menuImage[20]="image\\menu.bmp";
+char optionMenu[35] = "image\\SelectOption.bmp";
+//char startImage[20]="image\\start.bmp";
+//char endImage[20] = "image\\end.bmp";
+
+
+
+void iDraw()
+{
+	if(levelOne){
+
+		iClear();
+
+		//iSetTimer(0, change);
+
+		/*if(collision){
+				iShowBMP(0,0,"image\\gameOver.bmp");
+		}*/
+		//else{
+	
+		if(!optionSelectionBool){
+			iShowBMP(0,0,optionMenu);
+		
+			bool optionMenuFinished = true;
+		}
+
+	
+		/*if(optionMenuFinished){
+			iShowBMP2(obstacleXcoOrdinate,0,obstacleImage,0);
+		}*/
+
+	
+		if(backgroundImageBool){
+
+			iShowBMPAlternative(a,0,"image\\newBackground1.bmp");
+			iShowBMPAlternative(c,0,"image\\newBackground2.bmp");
+
+			char scoreStr[20];
+			sprintf(scoreStr, "Score is: %d", score/3);
+
+
+			sprintf(lifeShowing,"Remaining Life:%d", lifeLoss/6);		
+	
+			iText(100,600,lifeShowing,GLUT_BITMAP_TIMES_ROMAN_24);
+			iText(1000,600,scoreStr,GLUT_BITMAP_TIMES_ROMAN_24);
+		
+			/*for(int i=0 ; i<3;i++){
+
+				iShowBMP(topBackground[i].x,topBackground[i].y,back1[i]);
+				iShowBMP(bottomBackground[i].x , bottomBackground[i].y , back2[i]);
+			}*/
+		}
+
+		if(menuImageBool){
+
+			iShowBMP(0,0,menuImage);
+			iSetColor(r,g,b);
+			iText(1000,600,"press W",GLUT_BITMAP_TIMES_ROMAN_24);
+			//iShowBMP(100,500,startImage);
+			//iShowBMP(100,400,endImage);
+			iSetColor(255,0,0);
+			//iText(115,480,"press 'S' to start");
+
+		}
+
+	
+		else if(optionSelectionBool) {
+
+			if(jump){
+
+				if(jumpUp){
+
+					iShowBMP2(marioCoordinateX,marioCoordinateY + marioCoordinateJump, marioJ[0], 0);
+				
+				}
+				else iShowBMP2(marioCoordinateX,marioCoordinateY + marioCoordinateJump, marioJ[1], 0);
+
+			}
+
+			else {
+
+				if(!standPositon){
+		
+					if(!collision)iShowBMP2(marioCoordinateX,marioCoordinateY,marImage[marioIndex],0);
+					if(collision){
+
+						iShowBMP2(0,0,"image\\heroFailed.bmp",0);
+					
+						standPositon=false;
+						collision = false;
+			
+					}
+					if(standCounter >=10){
+						standCounter = 0;
+						marioIndex = 0;
+						standPositon = false;
+					}
+		
+				}
+			
+	
+		
+		}
+	
+			}
+		/*if(obsStartComing){
+			iShowBMP2(obstacleXcoOrdinate,0,obstacleImage,0);
+			obstacleXcoOrdinate -=25;
+		}*/
+
+		if(obsStartComing)obstacleMovement();
+
+		if(credit){
+			iShowBMP(0,0,"image\\credit.bmp");
+	
+		}
+		if(difficulty){
+			iShowBMP(0,0,"image\\EasyMediumHard.bmp");
+		}
+		if(instructionForGame){
+			iShowBMP(0,0,"image\\instruction.bmp");
+		}
+
+		if(showBorderForOption){
+			iSetColor(255,255,255);
+			iRectangle(40,380,6,52);
+		}
+
+		if(level1_written_above){
+			iSetColor(255,0,0);
+			iText(600,660,"LEVEL 1",GLUT_BITMAP_TIMES_ROMAN_24);
+		}
+
+	
+		//iText(1000,660,str,GLUT_BITMAP_TIMES_ROMAN_24);
+
+		game_over();
+	}
+
+	
+	if(game_done)iShowBMP(0,0,"image\\gameOver_greetings.bmp");
+
+
+	if(levelTwo){
+
+				iClear();
+
+				
+
+
+
+		/*if(collision){
+				iShowBMP(0,0,"image\\gameOver.bmp");
+		}*/
+		//else{
+
+
+				//player can not select option in level2. that's whay following if block is commented.
+
+
+				if(!optionSelectionBool_for_level2){
+					iShowBMP(0,0,optionMenu);
+		
+					bool optionMenuFinished_for_level2 = true;
+				}
+
+
+
+	
+		/*if(optionMenuFinished){
+			iShowBMP2(obstacleXcoOrdinate,0,obstacleImage,0);
+		}*/
+
+	
+		if(backgroundImageBool_for_level2){
+
+			iShowBMPAlternative(a_for_level2,0,"image\\background1_for_level2.bmp");
+			iShowBMPAlternative(c_for_level2,0,"image\\background2_for_level2.bmp");
+
+			char scoreStr[20];
+			sprintf(scoreStr, "Score is: %d", score/8);
+
+			
+			sprintf(lifeShowing_for_level2,"Remaining Life:%d", lifeLoss_for_level2/6);		
+	
+			iText(100,600,lifeShowing_for_level2,GLUT_BITMAP_TIMES_ROMAN_24);
+			iText(1000,600,scoreStr,GLUT_BITMAP_TIMES_ROMAN_24);
+		
+			/*for(int i=0 ; i<3;i++){
+
+				iShowBMP(topBackground[i].x,topBackground[i].y,back1[i]);
+				iShowBMP(bottomBackground[i].x , bottomBackground[i].y , back2[i]);
+			}*/
+		}
+
+		if(menuImageBool_for_level2){
+
+			iShowBMP(0,0,"image\\greetings_after_level1.bmp");
+			iSetColor(r,g,b);
+			iText(1000,600,"press W",GLUT_BITMAP_TIMES_ROMAN_24);
+			//iShowBMP(100,500,startImage);
+			//iShowBMP(100,400,endImage);
+			iSetColor(255,0,0);
+			//iText(115,480,"press 'S' to start");
+
+		}
+
+	
+		else if(!optionSelectionBool_for_level2) {
+
+			if(jump_for_level2){
+
+				if(jumpUp_for_level2){
+
+					iShowBMP2(marioCoordinateX_for_level2,marioCoordinateY_for_level2 + marioCoordinateJump_for_level2, marioJ_for_level2[0], 0);
+				
+				}
+				else iShowBMP2(marioCoordinateX_for_level2,marioCoordinateY_for_level2 + marioCoordinateJump_for_level2, marioJ_for_level2[1], 0);
+
+			}
+
+			else {
+
+				if(!standPositon_for_level2){
+		
+					if(!collision_for_level2)iShowBMP2(marioCoordinateX_for_level2,marioCoordinateY_for_level2,marImage_for_level2[marioIndex_for_level2],0);
+					if(collision_for_level2){
+
+						iShowBMP2(0,0,"image\\heroFailed.bmp",0);
+					
+						standPositon_for_level2=false;
+						collision_for_level2 = false;
+			
+					}
+					if(standCounter_for_level2 >=10){
+						standCounter_for_level2 = 0;
+						marioIndex_for_level2 = 0;
+						standPositon_for_level2 = false;
+					}
+		
+				}
+			
+	
+		
+		}
+	
+			}
+		/*if(obsStartComing){
+			iShowBMP2(obstacleXcoOrdinate,0,obstacleImage,0);
+			obstacleXcoOrdinate -=25;
+		}*/
+
+		if(obsStartComing_for_level2)obstacleMovement_for_level2();
+
+		if(credit_for_level2){
+			iShowBMP(0,0,"image\\credit.bmp");
+	
+		}
+
+		if(showBorderForOption){
+			iSetColor(255,255,255);
+			iRectangle(40,380,6,52);
+		}
+
+	
+		//iText(1000,660,str,GLUT_BITMAP_TIMES_ROMAN_24);
+
+		if(level2_written_above){
+			iSetColor(r,g,b);
+			iText(600,660,"LEVEL 2",GLUT_BITMAP_TIMES_ROMAN_24);
+		}
+
+		game_over_for_level2();
+
+	}
+
+	if(levelTwo){
+
+		//setObstacleVariable_for_level2();
+
+		newBackgroundChange_for_level2();
+		changeColorOfWbar();
+		runningPosition_for_level2();
+		change_for_level2();
+
+		//iSetTimer(20,change2);
+		//iInitialize(screen_width, screen_height, "Bad Land");
+	}
+
+	
+	
+}
+	 
+		//}
+
+
+/*
+ function iMouseMove() is called when the user presses and drags the mouse.
+ (mx, my) is the position where the mouse pointer is.
+ */
+void iMouseMove(int mx, int my)
+{
+	//printf("x = %d, y= %d\n", mx, my);
+	//place your codes here
+	
+
+	if( !optionSelectionBool && (40 <= mx && mx <= 286) && (380 <= my && my <= 432) ){
+		showBorderForOption = true;
+		
+	}
+	
+}
+
+
+/*
+ function iMouse() is called when the user presses/releases the mouse.
+ (mx, my) is the position where the mouse pointer is.
+ */
+void iMouse(int button, int state, int mx, int my)
+{
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		//place your codes here
+		//	printf("x = %d, y= %d\n",mx,my);
+		//q =mx;
+		//w =my;
+		if(levelOne){
+
+			if( (40 <= mx && mx <= 286) && (380 <= my && my <= 432) ){
+				menuImageBool = false;
+				backgroundImageBool = true;
+				optionSelectionBool = true;
+				obsStartComing=true;
+
+				level1_written_above = true;
+
+			}
+			else if((40 <=mx && mx<=286) && (18 <=my && my<=68)){
+				exit(0);
+			}
+
+			else if((40 <=mx && mx<=286) && ((680-580) <=my && my<=(680-526))){
+				credit = true;
+			}
+
+			else if((40 <=mx && mx<=258) && ((680-394) <=my && my <=(680-337))){
+				difficulty = true;
+			}
+
+			else if((38 <=mx && mx <285) && ((680-490) <=my && my <=(680-431))){
+				instructionForGame = true;
+			}
+
+			else if(credit && (918<=mx && mx <=1082) && (680-652 <=my && my <=680-597)){
+				credit = false;
+			}
+			else if(difficulty &&(952 <=mx && mx <=1117) && (680-630<=my && my <=680-577)){
+				difficulty = false;
+			}
+			else if(instructionForGame &&(952 <=mx && mx <=1117) && (680-630<=my && my <=680-577)){
+				instructionForGame = false;
+			}
+
+			
+
+		}
+
+		if(levelTwo){
+			if( (40 <= mx && mx <= 286) && (380 <= my && my <= 432) ){
+				/*menuImageBool_for_level2 = false;
+				backgroundImageBool_for_level2 = true;
+				optionSelectionBool_for_level2 = true;
+				obsStartComing_for_level2=true;
+
+				obstacleComing_for_level2 = true;*/
+
+			}
+			else if((40 <=mx && mx<=286) && (18 <=my && my<=68)){
+				exit(0);
+			}
+
+			else if((40 <=mx && mx<=286) && ((680-580) <=my && my<=(680-526))){
+				credit_for_level2 = true;
+			}
+
+			else if(credit_for_level2 && (918<=mx && mx <=1082) && (680-652 <=my && my <=680-597)){
+				credit_for_level2 = false;
+			}
+
+		}
+		
+	}
+
+	
+	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
+		//place your codes here
+		x -= 10;
+		y -= 10;
+	}
+}
+
+/*
+ function iKeyboard() is called whenever the user hits a key in keyboard.
+ key- holds the ASCII value of the key pressed.
+ */
+void iKeyboard(unsigned char key)
+{
+
+	if(key != '\b'){
+
+		str[indexNumberOfPlayerName]=key;
+		indexNumberOfPlayerName++;
+		str[indexNumberOfPlayerName] = '\0';
+
+	}
+	else if(key == '\b'){
+
+			if(indexNumberOfPlayerName<=0)indexNumberOfPlayerName=0;
+			else indexNumberOfPlayerName--;
+			str[indexNumberOfPlayerName]='\0';
+
+	}
+
+	else if(key =='\n'){
+
+		openFile=true;
+	}
+	if (key == 'q')
+	{
+		//exit(0);
+	}
+
+	
+	if (key == 'a' ){
+		 
+	}
+	else if (key == 'd'){
+		
+	}
+	
+	else if (key == 's'){
+		
+		//obstStart = true;
+		
+	}
+
+	else if (key == 'w'){
+
+		if(levelOne){
+			menuImageBool=false;
+			optionSelectionBool = false;
+			backgroundImageBool = false;
+		}
+
+		if(levelTwo){
+
+			menuImageBool_for_level2 = false;
+			optionSelectionBool_for_level2 = false;
+			backgroundImageBool_for_level2 = false;
+
+				//menuImageBool_for_level2 = false;
+				backgroundImageBool_for_level2 = true;
+				//optionSelectionBool_for_level2 = true;
+				obsStartComing_for_level2=true;
+
+				obstacleComing_for_level2 = true;
+
+				level2_written_above = true;
+		}
+		
+		
+	}
+
+	else if (key ==' '){
+		if(levelOne){
+			if(!jump){
+					jump = true;
+					jumpUp = true;
+			}
+		}
+		if(levelTwo){
+
+			if(!jump_for_level2){
+
+				jump_for_level2 = true;
+				jumpUp_for_level2 = true;
+			}
+		}
+	}
+
+	
+	//place your codes for other keys here
+}
+
+/*
+ function iSpecialKeyboard() is called whenver user hits special keys like-
+ function keys, home, end, pg up, pg down, arraows etc. you have to use
+ appropriate constants to detect them. A list is:
+ GLUT_KEY_F1, GLUT_KEY_F2, GLUT_KEY_F3, GLUT_KEY_F4, GLUT_KEY_F5, GLUT_KEY_F6,
+ GLUT_KEY_F7, GLUT_KEY_F8, GLUT_KEY_F9, GLUT_KEY_F10, GLUT_KEY_F11, GLUT_KEY_F12,
+ GLUT_KEY_LEFT, GLUT_KEY_UP, GLUT_KEY_RIGHT, GLUT_KEY_DOWN, GLUT_KEY_PAGE UP,
+ GLUT_KEY_PAGE DOWN, GLUT_KEY_HOME, GLUT_KEY_END, GLUT_KEY_INSERT
+ */
+void iSpecialKeyboard(unsigned char key)
+{
+
+	if (key == GLUT_KEY_END)
+	{
+		exit(0);
+	}
+
+	if(key == GLUT_KEY_LEFT){
+		
+	}
+	if(key == GLUT_KEY_RIGHT){
+
+		//marioCoordinateX +=10;
+		/*marioIndex++;
+		standCounter ++;
+
+		if(marioIndex >=3)marioIndex = 0;
+
+		standPositon = false;*/
+		
+	}
+	//place your codes for other keys here
+	
+}
+
+
+
+
+
+int main()
+{
+
+	//functionOfMain();
+
+	printf("faisal");
+	
+	//indexNumberOfPlayerName = strlen(str)-1;
+	if(levelOne){
+
+		file();
+	
+		setObstacleVariable();
+
+		//iSetTimer(80,obsChange);
+
+		if(music){
+			PlaySound("image\\mus.wav", NULL, SND_LOOP | SND_ASYNC);
+		}
+
+		iSetTimer(100,newBackgroundChange);
+		iSetTimer(20,changeColorOfWbar);
+		iSetTimer(150,runningPosition);
+		iSetTimer(20,change);
+
+		iInitialize(screen_width, screen_height, "Bad Land");
+	//	return 0;
+	}
+
+	else if(levelTwo){
+		printf("djhgkjh");
+		
+	
+		setObstacleVariable_for_level2();
+
+		//iSetTimer(80,obsChange);
+
+		if(music_for_level2){
+			PlaySound("image\\mus.wav", NULL, SND_LOOP | SND_ASYNC);
+		}
+
+		iSetTimer(100,newBackgroundChange_for_level2);
+		iSetTimer(20,changeColorOfWbar);
+		iSetTimer(150,runningPosition_for_level2);
+		iSetTimer(20,change_for_level2);
+		//iSetTimer(20,change2);
+		iInitialize(screen_width, screen_height, "Bad Land");
+	//	return 0;
+	}
+	return 0;
+
+}
+
+
+
+//Created Header file er code
+
+#include<stdio.h>
+
+//void differentObstacle();
+
+void functionOfMain();
+
+#define JUMP_LIMIT 90
+#define back1Speed 10
+#define back2Speed 10
+#define screen_width 1200
+#define screen_height 680
+#define obstSpeed 50
+
+int abc = 0;
+
+bool levelOne = true;
+bool levelTwo = false;
+
+bool game_done = false;
+
+bool level1_written_above = false;
+bool level2_written_above=false;
+
+bool obstacleComing_for_level2 = false;
+
+bool jump = false;
+bool jumpUp = false;
+bool obsStartComing = false;
+bool credit = false;
+
+bool difficulty = false;
+bool instructionForGame = false;
+
+bool jump_for_level2 = false;
+bool jumpUp_for_level2=false;
+bool obsStartComing_for_level2 = false;
+bool credit_for_level2 = false;
+
+bool nextObstacle = false;
+bool nextObstacle_for_level2 = false;
+
+int marioIndex = 0;
+int standCounter = 0;
+int indexOfObstacle=0;
+
+int marioIndex_for_level2 =0;
+int standCounter_for_level2 = 0;
+int indexOfObstacle_for_level2 = 0;
+
+int lifeLoss=18;
+int lifeLoss_for_level2=18;
+
+int i=0;
+
+int numberOfObstacle = 1;
+int numberOfObstacle_for_level2 = 1;
+
+bool standPositon = true;
+bool standPositon_for_level2 = true;
+
+bool collision = false;
+bool collision_for_level2 = false;
+
+bool openFile=true;
+
+bool firstLife=true;
+bool firstLife_for_level2 = true;
+
+bool secondLife=false;
+bool secondLife_for_level2 = false;
+
+bool gameOverMusic = false;
+
+bool music = true;
+bool music_for_level2 = true;
+
+
+int marioCoordinateJump = 0;
+int marioCoordinateJump_for_level2=0;
+
+int r = 255,g=255,b=255;
+
+
+int score=0;
+int score_for_level2 = 0;
+
+int obstacleXcoOrdinate=screen_width;
+int obstacleXcoOrdinate_for_level2 = screen_width;
+
+int a=0,e=0;
+int a_for_level2 = 0,e_for_level2 =0;
+
+int c=screen_width,d=screen_height;
+int c_for_level2=screen_width,d_for_level2 = screen_height;
+
+char text[100];
+
+char str[100];
+char playerName[100];
+
+int indexNumberOfPlayerName = 0;
+
+
+char lifeShowing[20];
+char lifeShowing_for_level2[20];
+
+char imageOfObstacle[3][15]= {"image\\ob.bmp", "image\\ob1.bmp", "image\\ob2.bmp"};
+
+char imageOfObstacle_for_level2[8][15]={"image\\ob.bmp", "image\\ob1.bmp", "image\\ob2.bmp", "image\\ob3.bmp","image\\ob4.bmp","image\\ob5.bmp","image\\ob6.bmp","image\\ob7.bmp"};
+
+
+struct fiveObstacle{
+
+	int obstacleX;
+	int obstacleX_for_level2;
+
+	int obstacleIndex;
+	int obstacleIndex_for_level2;
+
+
+};
+
+fiveObstacle obstacleArray[3];
+
+fiveObstacle obstacleArray_for_level2[8];
+
+void change(){
+	if(jump){
+		if(jumpUp){
+			marioCoordinateJump +=12;
+
+			if(marioCoordinateJump >= JUMP_LIMIT){
+				jumpUp = false;
+			}
+		}
+		else {
+			marioCoordinateJump -=12;
+
+			if(marioCoordinateJump <=0){
+				jump = false;
+				marioCoordinateJump = 0;
+			}
+		}
+	}
+
+	if(obsStartComing){
+
+		for(int i=0;i<3;i++){
+
+		obstacleArray[i].obstacleX -=25;
+
+		if(obstacleArray[i].obstacleX<=100)obstacleArray[i].obstacleX-=40;
+
+		//code changing here for collision.
+
+		if(obstacleArray[i].obstacleX <= 100 && !jumpUp){
+
+			collision = true;
+			standPositon=true;
+			firstLife=false;
+			secondLife=true;
+
+			lifeLoss--;
+
+
+		
+		}
+
+		/*else if(obstacleArray[i].obstacleX <= 100 && marioCoordinateJump < 40){
+
+			collision = true;
+			standPositon=true;
+			firstLife=false;
+			secondLife=true;
+
+			lifeLoss--;
+		}*/
+
+
+		if(obstacleArray[i].obstacleX <=0 && !collision){
+			score++;
+
+			if( (score/3) >= 2){
+			
+				levelTwo = true;
+				levelOne = false;
+
+				if(!levelOne)lifeLoss+=6;
+
+			}
+
+		}
+		if(obstacleArray[i].obstacleX <-40){
+			obstacleXcoOrdinate = screen_width; 
+		}
+
+		if(obstacleArray[i].obstacleX <=0){
+
+			obstacleArray[i].obstacleX=screen_width;
+
+			//numberOfObstacle++;
+
+			nextObstacle = true;
+		}
+
+		if(nextObstacle){
+			obstacleArray[i].obstacleIndex++;
+			nextObstacle=false;
+
+		}
+		if(obstacleArray[i].obstacleIndex >2){
+
+				obstacleArray[i].obstacleIndex=0;
+		}
+
+	}
+}
+
+	
+}
+
+void change_for_level2(){
+
+	printf("hdkdkdfkdfkd");
+
+	if(jump_for_level2){
+		if(jumpUp_for_level2){
+			marioCoordinateJump_for_level2 +=12;
+
+			if(marioCoordinateJump_for_level2 >= JUMP_LIMIT){
+				jumpUp_for_level2 = false;
+			}
+		}
+		else {
+			marioCoordinateJump_for_level2 -=12;
+
+			if(marioCoordinateJump_for_level2 <=0){
+				jump_for_level2 = false;
+				marioCoordinateJump_for_level2 = 0;
+			}
+		}
+	}
+
+	if(obsStartComing_for_level2){
+		printf("0bs");
+		for(int i=0;i<8;i++){
+
+			obstacleArray_for_level2[i].obstacleX_for_level2 -=25;
+
+			if(obstacleArray_for_level2[i].obstacleX_for_level2<=100)obstacleArray_for_level2[i].obstacleX_for_level2-=40;
+
+		//code changing here for collision.
+
+			if(obstacleArray_for_level2[i].obstacleX_for_level2 <= 100 && !jumpUp_for_level2){
+
+			collision_for_level2 = true;
+			standPositon_for_level2=true;
+			firstLife_for_level2=false;
+			secondLife_for_level2=true;
+
+			lifeLoss_for_level2--;
+
+
+		
+		}
+
+		/*else if(obstacleArray[i].obstacleX <= 100 && marioCoordinateJump < 40){
+
+			collision = true;
+			standPositon=true;
+			firstLife=false;
+			secondLife=true;
+
+			lifeLoss--;
+		}*/
+
+
+			if(obstacleArray_for_level2[i].obstacleX_for_level2 <=0 && !collision_for_level2){
+			
+			score++;
+
+			if(score/8 >=3){
+				levelTwo= false;
+				game_done = true;
+			}
+
+		}
+			if(obstacleArray_for_level2[i].obstacleX_for_level2 <-40){
+			obstacleXcoOrdinate_for_level2 = screen_width; 
+		}
+
+			if(obstacleArray_for_level2[i].obstacleX_for_level2 <=0){
+
+				obstacleArray_for_level2[i].obstacleX_for_level2=screen_width;
+
+			//numberOfObstacle++;
+
+			nextObstacle_for_level2 = true;
+		}
+
+		if(nextObstacle_for_level2){
+			obstacleArray_for_level2[i].obstacleIndex_for_level2++;
+			nextObstacle_for_level2=false;
+
+		}
+		if(obstacleArray_for_level2[i].obstacleIndex_for_level2 >7){
+
+			obstacleArray_for_level2[i].obstacleIndex_for_level2=0;
+		}
+
+	}
+}
+
+}
+
+/*struct background{
+	int x;
+	
+};*/
+
+//background topBackground[3];
+//background bottomBackground[3];
+
+//background obstacle[2];
+
+
+
+
+
+/*void differentObstacle(){
+
+	//obstacleArray[0].obstacleIndex=0;
+	for(int i=0;i<3;i++){
+
+		obstacleArray[i].obstacleX -=25;
+
+		if(obstacleArray[i].obstacleX<=100)obstacleArray[i].obstacleX-=40;
+
+		//code changing here for collision.
+
+		if(obstacleArray[i].obstacleX <= 100 && !jumpUp){
+
+			collision = true;
+			standPositon=true;
+			firstLife=false;
+			secondLife=true;
+		
+		}
+
+
+		if(obstacleArray[i].obstacleX <=0 && !collision){
+			score++;
+
+		}
+		if(obstacleArray[i].obstacleX <-40){
+			obstacleXcoOrdinate = screen_width; 
+		}
+
+		if(obstacleArray[i].obstacleX <=0){
+
+			obstacleArray[i].obstacleX=screen_width;
+
+			//numberOfObstacle++;
+
+			nextObstacle = true;
+		}
+
+		if(nextObstacle){
+			obstacleArray[i].obstacleIndex++;
+			nextObstacle=false;
+
+		}
+		if(obstacleArray[i].obstacleIndex >2){
+
+				obstacleArray[i].obstacleIndex=0;
+		}
+
+	}
+}*/
+
+void setObstacleVariable(){
+
+	for(int i=0;i<3;i++){
+
+		obstacleArray[i].obstacleX = screen_width;
+	
+			if(nextObstacle)obstacleArray[i].obstacleIndex = rand()%3;
+			
+	}
+}
+
+void setObstacleVariable_for_level2(){
+
+	for(int i=0;i<8;i++){
+
+		obstacleArray_for_level2[i].obstacleX_for_level2 = screen_width;
+	
+		if(nextObstacle_for_level2)obstacleArray_for_level2[i].obstacleIndex_for_level2 = rand()%8;
+			
+	}
+
+}
+
+	void obstacleMovement(){
+
+		for(int i=0 ;i<3;i++){
+
+			iShowBMP2(obstacleArray[i].obstacleX,0,imageOfObstacle[obstacleArray[i].obstacleIndex],0);
+			
+		}
+	}
+
+	void obstacleMovement_for_level2(){
+
+		for(int i=0 ;i<8;i++){
+
+			iShowBMP2(obstacleArray_for_level2[i].obstacleX_for_level2,0,imageOfObstacle_for_level2[obstacleArray_for_level2[i].obstacleIndex_for_level2],0);
+			
+		}
+
+	}
+
+
+
+
+
+
+/*void change2(){
+
+	for(int i = 0; i<3 ; i++){
+
+		topBackground[i].x -= back1Speed;
+		bottomBackground[i].x -= back2Speed;
+
+		if(topBackground[i].x <=0){
+			topBackground[i].x = screen_width;
+
+		}
+		if(bottomBackground[i].x <=0){
+			bottomBackground[i].x = screen_width;
+		}
+	}
+
+}*/
+
+/*void showBack(){
+
+
+	int sum = 0;
+
+	for(int i =0 ;i<3; i++){
+			
+
+		topBackground[i].y = 264;
+		bottomBackground[i].y = 0;
+		topBackground[i].x = sum;
+		bottomBackground[i].x = sum;
+
+		sum += 455;
+
+
+	}
+}*/
+
+//char obstacleImage[15] = "image\\ob.bmp";
+
+
+/*void obsChange(){
+	
+	//obstacle[0].x -=obstSpeed; 
+	//i have changed here
+	//indexOfObstacle++;
+	//if(indexOfObstacle==2)indexOfObstacle=0;
+
+	iShowBMP(obstacleXcoOrdinate,0,obstacleImage);
+	//obstacleXcoOrdinate -=25;
+	if(obstacleXcoOrdinate == 100 && !jumpUp){
+		
+		collision = true;
+		
+		standPositon = true;
+
+	}
+	if(obstacleXcoOrdinate <=0 && !collision){
+		score++;
+
+	}
+	if(obstacleXcoOrdinate <-40){
+		obstacleXcoOrdinate = screen_width; 
+	}
+}*/
+
+void obsChange_collision(){
+
+
+
+}
+
+void runningPosition(){
+			marioIndex++;
+		standCounter ++;
+
+		if(marioIndex >=3)marioIndex = 0;
+
+		standPositon = false;
+}
+
+void runningPosition_for_level2(){
+
+	marioIndex_for_level2++;
+	standCounter_for_level2++;
+
+	if(marioIndex_for_level2 >=3)marioIndex_for_level2 =0;
+	standPositon_for_level2=false;
+}
+
+
+void changeColorOfWbar(){
+	r = rand()%255;
+	g = rand()%255;
+	b = rand()%255;
+}
+
+void newBackgroundChange(){
+	if(c==0){
+		a=screen_width;
+	}
+	if(a==0){
+
+		c=screen_width;
+	}
+	a-=20;
+
+	c-=20;
+
+	
+}
+
+void newBackgroundChange_for_level2(){
+
+	if(c_for_level2==0){
+		a_for_level2=screen_width;
+	}
+
+	if(a_for_level2 == 0){
+
+		c_for_level2 = screen_width;
+	}
+
+	a_for_level2 -=20;
+	c_for_level2 -=20;
+}
+
+char write[50];
+
+void file(){
+
+	if(openFile){
+
+		FILE *pfile;
+
+		pfile = fopen("abc.txt","w");
+
+		strcpy(playerName,str);
+
+		fprintf(pfile,playerName);
+
+		fclose(pfile);
+
+
+
+	}
+}
+
+void game_over(){
+
+	if(lifeLoss<=0){
+
+		iShowBMP(0,0,"image\\gameOver.bmp");
+
+		gameOverMusic = true;
+
+		music = false;
+		if(!music){
+			PlaySound(0,0,0);
+
+		}
+	}
+}
+
+void game_over_for_level2(){
+	if(lifeLoss_for_level2 <=0){
+		iShowBMP(0,0,"image\\gameOver.bmp");
+		music_for_level2 = false;
+
+		if(!music_for_level2){
+			PlaySound(0,0,0);
+		}
+	}
+}
+
+
+// HIGH SCORE
+
+/*struct highscores
+{
+	char name[100];
+	int scores;
+
+}h[5],temp;
+void sort()
+{
+	int k;
+	for(i = 0 ; i < 4 ; i++)
+	{
+		for(k = 0 ; k < 4 ; k++)
+		{
+			if(h[k].scores < h[k+1].scores)
+			{
+				temp = h[k+1];
+				h[k+1] = h[k];
+				h[k] = temp;
+			}
+		}
+	}
+	SaveToFile();
+
+}
+void CopyFromFile()
+{
+	namefile = fopen("hscore.txt","r");
+	for(i = 0 ; i < 4 ; i++)
+	{
+		fscanf(namefile,"%s %d\n",h[i].name, &h[i].scores);
+	}
+	fclose(namefile);
+}
+void SaveToFile()
+{
+	namefile = fopen("hscore.txt","w");
+	for(i = 0 ; i < 4 ; i++)
+	{
+		fprintf(namefile,"%s %d\n",h[i].name, h[i].scores);
+	}
+	fclose(namefile);
+}
+void showHighscore()
+{
+	int dy = 330;
+	for(i = 0 ; i < 4 ; i++,dy -= 330/5)
+	{
+		iSetColor(128,128,128);
+		iFilledRectangle(50,dy-5,680,30);
+		iSetColor(72,0,0);
+		iText(80,dy,h[i].name,GLUT_BITMAP_TIMES_ROMAN_24);
+		char text[80];
+		//sprintf_s(text,"%d",h[i].scores);
+		iText(530,dy,text,GLUT_BITMAP_TIMES_ROMAN_24);
+
+	}
+}*/
+
+
+
+
